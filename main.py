@@ -104,7 +104,6 @@ def ap_query():
                 break
         except:
             break
-
     return full_list
 
 success = api_login()
