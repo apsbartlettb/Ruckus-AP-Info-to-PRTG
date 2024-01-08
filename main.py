@@ -12,6 +12,8 @@ api_base_url = os.getenv("API_URL_BASE")
 
 serviceTicket = ""
 st_file = "serviceTicket.txt"
+ap_output_directory = "C:\\Program Files (x86)\\PRTG Network Monitor\\webroot\\ruckus"
+ap_output_directory = "ruckus"
 
 apsZoneUID = ""
     
@@ -124,14 +126,27 @@ if success == True:
     ap_query_response = ap_query()
 
     for device in ap_query_response:
-        result_dict = {
-                    "channel": f"{device['deviceName']} 5Ghz Airtime",
-                    "value": device['airtime5G'],
-                    "unit": "Percent",
-                    "Mode": "Absolute"
+        result_json = {
+                "prtg": {
+                    "result": [
+
+                    ]
                 }
-        
-        final_json['prtg']['result'].append(result_dict)
+        }
+        for key, value in device.items():
+            if value != True and value != False:
+                if isinstance(value, int):
+                    result_json['prtg']['result'].append({
+                                "channel": key,
+                                "value": value
+                                # "unit": "Percent",
+                                # "Mode": "Absolute"
+                            })
+        final_json['prtg']['result'].append(result_json)
+        # Write json file
+        jsonfname = f"{device['deviceName']}.html"
+        with open(f"{ap_output_directory}/{jsonfname}", 'w') as file:
+            file.write(json.dumps(result_json))
     print(json.dumps(final_json))
 
 api_logoff()
